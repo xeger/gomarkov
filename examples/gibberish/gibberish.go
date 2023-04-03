@@ -10,8 +10,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/mb-14/gomarkov"
 	"github.com/montanaflynn/stats"
+	"github.com/xeger/gomarkov"
 )
 
 const minimumProbability = 0.05
@@ -40,7 +40,7 @@ func main() {
 			return
 		}
 		score := sequenceProbablity(model.Chain, *username)
-		normalizedScore := (score -  model.Mean) / model.StdDev
+		normalizedScore := (score - model.Mean) / model.StdDev
 		isGibberish := normalizedScore < 0
 		fmt.Printf("Score: %f | Gibberish: %t\n", normalizedScore, isGibberish)
 	}

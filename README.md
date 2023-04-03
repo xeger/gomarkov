@@ -1,6 +1,6 @@
 # gomarkov
-[![GoDoc](https://godoc.org/github.com/mb-14/gomarkov?status.svg)](https://godoc.org/github.com/mb-14/gomarkov)
-[![Go Report Card](https://goreportcard.com/badge/github.com/mb-14/gomarkov)](https://goreportcard.com/report/github.com/mb-14/gomarkov)
+[![GoDoc](https://godoc.org/github.com/xeger/gomarkov?status.svg)](https://godoc.org/github.com/xeger/gomarkov)
+[![Go Report Card](https://goreportcard.com/badge/github.com/xeger/gomarkov)](https://goreportcard.com/report/github.com/xeger/gomarkov)
 
 Go implementation of markov chains for textual data.
 
@@ -11,7 +11,7 @@ You can find out more about markov chains [here](http://setosa.io/ev/markov-chai
 package main
 
 import (
-	"github.com/mb-14/gomarkov"
+	"github.com/xeger/gomarkov"
 	"fmt"
 	"strings"
 	"io/ioutil"
