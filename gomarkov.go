@@ -9,14 +9,14 @@ import (
 	"time"
 )
 
-//Tokens are wrapped around a sequence of words to maintain the
-//start and end transition counts
+// Tokens are wrapped around a sequence of words to maintain the
+// start and end transition counts.
 const (
-	StartToken = "$"
-	EndToken   = "^"
+	StartToken = "^"
+	EndToken   = "$"
 )
 
-//Chain is a markov chain instance
+// Chain is a markov chain instance
 type Chain struct {
 	Order        int
 	statePool    *spool
@@ -30,7 +30,7 @@ type chainJSON struct {
 	FreqMat  map[int]sparseArray `json:"freq_mat"`
 }
 
-//MarshalJSON ...
+// MarshalJSON ...
 func (chain Chain) MarshalJSON() ([]byte, error) {
 	obj := chainJSON{
 		chain.Order,
@@ -40,7 +40,7 @@ func (chain Chain) MarshalJSON() ([]byte, error) {
 	return json.Marshal(obj)
 }
 
-//UnmarshalJSON ...
+// UnmarshalJSON ...
 func (chain *Chain) UnmarshalJSON(b []byte) error {
 	var obj chainJSON
 	err := json.Unmarshal(b, &obj)
@@ -61,7 +61,7 @@ func (chain *Chain) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-//NewChain creates an instance of Chain
+// NewChain creates an instance of Chain
 func NewChain(order int) *Chain {
 	chain := Chain{Order: order}
 	chain.statePool = &spool{
@@ -73,7 +73,7 @@ func NewChain(order int) *Chain {
 	return &chain
 }
 
-//Add adds the transition counts to the chain for a given sequence of words
+// Add adds the transition counts to the chain for a given sequence of words
 func (chain *Chain) Add(input []string) {
 	startTokens := array(StartToken, chain.Order)
 	endTokens := array(EndToken, chain.Order)
@@ -95,7 +95,7 @@ func (chain *Chain) Add(input []string) {
 	}
 }
 
-//TransitionProbability returns the transition probability between two states
+// TransitionProbability returns the transition probability between two states
 func (chain *Chain) TransitionProbability(next string, current NGram) (float64, error) {
 	if len(current) != chain.Order {
 		return 0, errors.New("N-gram length does not match chain order")
@@ -111,7 +111,7 @@ func (chain *Chain) TransitionProbability(next string, current NGram) (float64, 
 	return freq / sum, nil
 }
 
-//Generate generates new text based on an initial seed of words
+// Generate generates new text based on an initial seed of words
 func (chain *Chain) Generate(current NGram) (string, error) {
 	if len(current) != chain.Order {
 		return "", errors.New("N-gram length does not match chain order")
