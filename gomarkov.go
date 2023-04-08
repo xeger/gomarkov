@@ -10,10 +10,10 @@ import (
 )
 
 // Tokens are wrapped around a sequence of words to maintain the
-// start and end transition counts
+// start and end transition counts.
 const (
-	StartToken = "$"
-	EndToken   = "^"
+	StartToken = "^"
+	EndToken   = "$"
 )
 
 // Chain is a markov chain instance

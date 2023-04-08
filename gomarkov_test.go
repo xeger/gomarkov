@@ -16,8 +16,8 @@ func TestChain_MarshalJSON(t *testing.T) {
 	}{
 		{"Empty chain", 2, [][]string{}, `{"int":2,"spool_map":{},"freq_mat":{}}`, false},
 		{"Empty chain, order 1", 1, [][]string{}, `{"int":1,"spool_map":{},"freq_mat":{}}`, false},
-		{"Trained once", 1, [][]string{{"Test"}}, `{"int":1,"spool_map":{"$":0,"Test":1,"^":2},"freq_mat":{"0":{"1":1},"1":{"2":1}}}`, false},
-		{"Trained on more data", 1, [][]string{{"test", "data"}, {"test", "data"}, {"test", "node"}}, `{"int":1,"spool_map":{"$":0,"^":3,"data":2,"node":4,"test":1},"freq_mat":{"0":{"1":3},"1":{"2":2,"4":1},"2":{"3":2},"4":{"3":1}}}`, false},
+		{"Trained once", 1, [][]string{{"Test"}}, `{"int":1,"spool_map":{"$":2,"Test":1,"^":0},"freq_mat":{"0":{"1":1},"1":{"2":1}}}`, false},
+		{"Trained on more data", 1, [][]string{{"test", "data"}, {"test", "data"}, {"test", "node"}}, `{"int":1,"spool_map":{"$":3,"^":0,"data":2,"node":4,"test":1},"freq_mat":{"0":{"1":3},"1":{"2":2,"4":1},"2":{"3":2},"4":{"3":1}}}`, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -45,7 +45,7 @@ func TestChain_UnmarshalJSON(t *testing.T) {
 		wantErr bool
 	}{
 		{"Empty chain", []byte(`{"int":2,"spool_map":{},"freq_mat":{}}`), false},
-		{"More complex chain", []byte(`{"int":1,"spool_map":{"$":0,"^":3,"data":2,"node":4,"test":1},"freq_mat":{"0":{"1":3},"1":{"2":2,"4":1},"2":{"3":2},"4":{"3":1}}}`), false},
+		{"More complex chain", []byte(`{"int":1,"spool_map":{"^":0,"$":3,"data":2,"node":4,"test":1},"freq_mat":{"0":{"1":3},"1":{"2":2,"4":1},"2":{"3":2},"4":{"3":1}}}`), false},
 		{"Invalid json", []byte(`{{"int":2,"spool_map":{},"freq_mat":{}}`), true},
 	}
 	for _, tt := range tests {
@@ -113,42 +113,42 @@ func TestChain_TransitionProbability(t *testing.T) {
 	}{
 		{
 			"Simple transition positive",
-			[]byte(`{"int":1,"spool_map":{"$":0,"Test":1,"^":2},"freq_mat":{"0":{"1":1},"1":{"2":1}}}`),
-			args{next: "Test", current: NGram{"$"}},
+			[]byte(`{"int":1,"spool_map":{"^":0,"Test":1,"$":2},"freq_mat":{"0":{"1":1},"1":{"2":1}}}`),
+			args{next: "Test", current: NGram{"^"}},
 			1,
 			false,
 		},
 		{
 			"Simple transition negative",
-			[]byte(`{"int":1,"spool_map":{"$":0,"Test":1,"^":2},"freq_mat":{"0":{"1":1},"1":{"2":1}}}`),
+			[]byte(`{"int":1,"spool_map":{"^":0,"Test":1,"$":2},"freq_mat":{"0":{"1":1},"1":{"2":1}}}`),
 			args{next: "Test", current: NGram{"Test"}},
 			0,
 			false,
 		},
 		{
 			"Unknown next Ngram",
-			[]byte(`{"int":1,"spool_map":{"$":0,"Test":1,"^":2},"freq_mat":{"0":{"1":1},"1":{"2":1}}}`),
+			[]byte(`{"int":1,"spool_map":{"^":0,"Test":1,"$":2},"freq_mat":{"0":{"1":1},"1":{"2":1}}}`),
 			args{next: "Unknown", current: NGram{"Test"}},
 			0,
 			false,
 		},
 		{
 			"Unknown ncurent Ngram",
-			[]byte(`{"int":1,"spool_map":{"$":0,"Test":1,"^":2},"freq_mat":{"0":{"1":1},"1":{"2":1}}}`),
+			[]byte(`{"int":1,"spool_map":{"^":0,"Test":1,"$":2},"freq_mat":{"0":{"1":1},"1":{"2":1}}}`),
 			args{next: "Test", current: NGram{"Unknown"}},
 			0,
 			false,
 		},
 		{
 			"Invalid Ngram",
-			[]byte(`{"int":1,"spool_map":{"$":0,"Test":1,"^":2},"freq_mat":{"0":{"1":1},"1":{"2":1}}}`),
+			[]byte(`{"int":1,"spool_map":{"^":0,"Test":1,"$":2},"freq_mat":{"0":{"1":1},"1":{"2":1}}}`),
 			args{next: "Unknown", current: NGram{"Test", "data"}},
 			0,
 			true,
 		},
 		{
 			"More than 1 option",
-			[]byte(`{"int":1,"spool_map":{"$":0,"^":3,"data":2,"node":4,"test":1},"freq_mat":{"0":{"1":3},"1":{"2":2,"4":2},"2":{"3":2},"4":{"3":1}}}`),
+			[]byte(`{"int":1,"spool_map":{"^":0,"$":3,"data":2,"node":4,"test":1},"freq_mat":{"0":{"1":3},"1":{"2":2,"4":2},"2":{"3":2},"4":{"3":1}}}`),
 			args{next: "node", current: NGram{"test"}},
 			0.5,
 			false,
@@ -184,43 +184,43 @@ func TestChain_Generate(t *testing.T) {
 	}{
 		{
 			"Start of simple chain",
-			[]byte(`{"int":1,"spool_map":{"$":0,"Test":1,"^":2},"freq_mat":{"0":{"1":1},"1":{"2":1}}}`),
-			args{current: NGram{"$"}},
+			[]byte(`{"int":1,"spool_map":{"^":0,"Test":1,"$":2},"freq_mat":{"0":{"1":1},"1":{"2":1}}}`),
+			args{current: NGram{"^"}},
 			"Test",
 			false,
 		},
 		{
 			"End of simple chain",
-			[]byte(`{"int":1,"spool_map":{"$":0,"Test":1,"^":2},"freq_mat":{"0":{"1":1},"1":{"2":1}}}`),
+			[]byte(`{"int":1,"spool_map":{"^":0,"Test":1,"$":2},"freq_mat":{"0":{"1":1},"1":{"2":1}}}`),
 			args{current: NGram{"Test"}},
-			"^",
+			"$",
 			false,
 		},
 		{
 			"Complex chain",
-			[]byte(`{"int":1,"spool_map":{"$":0,"^":3,"data":2,"node":4,"test":1},"freq_mat":{"0":{"1":3},"1":{"2":2,"4":0},"2":{"3":2},"4":{"3":1}}}`),
+			[]byte(`{"int":1,"spool_map":{"^":0,"$":3,"data":2,"node":4,"test":1},"freq_mat":{"0":{"1":3},"1":{"2":2,"4":0},"2":{"3":2},"4":{"3":1}}}`),
 			args{current: NGram{"test"}},
 			"data",
 			false,
 		},
 		{
 			"Invalid Ngram",
-			[]byte(`{"int":1,"spool_map":{"$":0,"Test":1,"^":2},"freq_mat":{"0":{"1":1},"1":{"2":1}}}`),
+			[]byte(`{"int":1,"spool_map":{"^":0,"Test":1,"$":2},"freq_mat":{"0":{"1":1},"1":{"2":1}}}`),
 			args{current: NGram{"Invalid", "Ngram"}},
 			"",
 			true,
 		},
 		{
 			"Unknown Ngram",
-			[]byte(`{"int":1,"spool_map":{"$":0,"Test":1,"^":2},"freq_mat":{"0":{"1":1},"1":{"2":1}}}`),
+			[]byte(`{"int":1,"spool_map":{"^":0,"Test":1,"$":2},"freq_mat":{"0":{"1":1},"1":{"2":1}}}`),
 			args{current: NGram{"Unknown"}},
 			"",
 			true,
 		},
 		{
 			"No next state",
-			[]byte(`{"int":1,"spool_map":{"$":0,"Test":1,"^":2},"freq_mat":{"0":{"1":1},"1":{"2":1}}}`),
-			args{current: NGram{"^"}},
+			[]byte(`{"int":1,"spool_map":{"^":0,"Test":1,"$":2},"freq_mat":{"0":{"1":1},"1":{"2":1}}}`),
+			args{current: NGram{"$"}},
 			"",
 			false,
 		},
