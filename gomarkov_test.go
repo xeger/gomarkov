@@ -183,6 +183,13 @@ func TestChain_Generate(t *testing.T) {
 		wantErr bool
 	}{
 		{
+			"Empty chain",
+			[]byte(`{"int":1,"spool_map":{},"freq_mat":{}}`),
+			args{current: NGram{"^"}},
+			"",
+			true,
+		},
+		{
 			"Start of simple chain",
 			[]byte(`{"int":1,"spool_map":{"^":0,"Test":1,"$":2},"freq_mat":{"0":{"1":1},"1":{"2":1}}}`),
 			args{current: NGram{"^"}},
@@ -242,7 +249,7 @@ func TestChain_Generate(t *testing.T) {
 	}
 }
 
-func TestChain_GenerateDet(t *testing.T) {
+func TestChain_GenerateDeterministic(t *testing.T) {
 	chain := NewChain(2)
 	chain.Add(NGram{"i", "like", "bees"})
 	chain.Add(NGram{"i", "like", "cake"})
